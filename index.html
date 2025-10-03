@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ribbit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom scrollbar for a cohesive dark mode look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        /* Basic animation for modals and pop-ups */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* Spinner for loading states */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #34d399;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 font-sans antialiased">
+
+    <!-- Global Loading Spinner -->
+    <div id="global-loader" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- ===== Authentication Page ===== -->
+    <div id="auth-page" class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-md p-8 space-y-8 bg-slate-800 rounded-2xl shadow-lg">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-emerald-400 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M18.37 12.43c0-1.35.34-2.63.93-3.73a.5.5 0 0 1 .84.54c-.55 1.02-.84 2.2-.84 3.48s.29 2.46.84 3.48a.5.5 0 0 1-.84.54c-.59-1.1-.93-2.38-.93-3.73Z"/><path d="M5.63 12.43c0 1.35-.34 2.63-.93 3.73a.5.5 0 0 1-.84-.54c.55-1.02.84-2.2.84-3.48s-.29-2.46-.84-3.48a.5.5 0 0 1 .84-.54c.59 1.1.93 2.38.93 3.73Z"/><path d="M12 18.27a4.5 4.5 0 0 0 4.5-4.5v-3a4.5 4.5 0 1 0-9 0v3a4.5 4.5 0 0 0 4.5 4.5Z"/><path d="M12 18.27V21s-4.5-2.25-4.5-6.32v-3a4.5 4.5 0 1 1 9 0v3C16.5 16.02 12 21 12 21Z"/><path d="M12 13.77a1.5 1.5 0 1 0-3 0v1.5a1.5 1.5 0 1 0 3 0v-1.5Z"/></svg>
+                    Ribbit
+                </h1>
+                <p class="text-slate-400 mt-2">A new place to connect and chat.</p>
+            </div>
+            
+            <div class="flex border-b border-slate-700">
+                <button id="show-signup-btn" class="flex-1 p-3 font-semibold text-emerald-400 border-b-2 border-emerald-400 transition">Sign Up</button>
+                <button id="show-login-btn" class="flex-1 p-3 font-semibold text-slate-400 transition">Log In</button>
+            </div>
+
+            <form id="signup-form" class="space-y-6">
+                <div>
+                    <label for="signup-username" class="text-sm font-medium text-slate-300">Username</label>
+                    <input id="signup-username" type="text" required class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Choose a unique username">
+                </div>
+                <div>
+                    <label for="signup-password" class="text-sm font-medium text-slate-300">Password</label>
+                    <input id="signup-password" type="password" required class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Create a secure password">
+                </div>
+                <div>
+                    <label for="signup-bio" class="text-sm font-medium text-slate-300">Bio</label>
+                    <textarea id="signup-bio" rows="2" class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Tell us a little about yourself..."></textarea>
+                </div>
+                <button type="submit" class="w-full p-3 font-semibold text-slate-900 bg-emerald-400 rounded-lg hover:bg-emerald-500 transition-colors">Create Account</button>
+            </form>
+
+            <form id="login-form" class="space-y-6 hidden">
+                 <div>
+                    <label for="login-username" class="text-sm font-medium text-slate-300">Username</label>
+                    <input id="login-username" type="text" required class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Enter your username">
+                </div>
+                <div>
+                    <label for="login-password" class="text-sm font-medium text-slate-300">Password</label>
+                    <input id="login-password" type="password" required class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Enter your password">
+                </div>
+                <button type="submit" class="w-full p-3 font-semibold text-slate-900 bg-emerald-400 rounded-lg hover:bg-emerald-500 transition-colors">Log In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Main Chat Application ===== -->
+    <div id="main-app" class="hidden h-screen w-full flex">
+        <aside class="flex flex-col w-full max-w-xs bg-slate-800 border-r border-slate-700">
+            <div id="profile-button" class="flex items-center p-4 cursor-pointer hover:bg-slate-700/50 transition">
+                <img id="sidebar-pfp" src="https://placehold.co/40x40/1e293b/94a3b8?text=PFP" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+                <div class="ml-3">
+                    <p id="sidebar-username" class="font-semibold">Username</p>
+                    <p class="text-xs text-slate-400">Online</p>
+                </div>
+            </div>
+            <div class="flex-1 p-2 space-y-1 overflow-y-auto">
+                <div class="px-2 py-1 text-xs font-bold text-slate-400 uppercase">Chats</div>
+                <div id="chat-list"></div>
+            </div>
+            <div class="p-4 border-t border-slate-700">
+                <button id="new-chat-btn" class="w-full flex items-center justify-center p-3 font-semibold text-slate-900 bg-emerald-400 rounded-lg hover:bg-emerald-500 transition-colors">
+                    <i data-lucide="plus" class="w-5 h-5 mr-2"></i> New Chat
+                </button>
+            </div>
+        </aside>
+        <main id="chat-area" class="flex-1 flex flex-col bg-slate-900">
+            <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center p-8">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600"><path d="M18.37 12.43c0-1.35.34-2.63.93-3.73a.5.5 0 0 1 .84.54c-.55 1.02-.84 2.2-.84 3.48s.29 2.46.84 3.48a.5.5 0 0 1-.84.54c-.59-1.1-.93-2.38-.93-3.73Z"/><path d="M5.63 12.43c0 1.35-.34 2.63-.93 3.73a.5.5 0 0 1-.84-.54c.55-1.02.84-2.2.84-3.48s-.29-2.46-.84-3.48a.5.5 0 0 1 .84-.54c.59 1.1.93 2.38.93 3.73Z"/><path d="M12 18.27a4.5 4.5 0 0 0 4.5-4.5v-3a4.5 4.5 0 1 0-9 0v3a4.5 4.5 0 0 0 4.5 4.5Z"/><path d="M12 18.27V21s-4.5-2.25-4.5-6.32v-3a4.5 4.5 0 1 1 9 0v3C16.5 16.02 12 21 12 21Z"/><path d="M12 13.77a1.5 1.5 0 1 0-3 0v1.5a1.5 1.5 0 1 0 3 0v-1.5Z"/></svg>
+                <h2 class="mt-4 text-2xl font-bold">Welcome to Ribbit!</h2>
+                <p class="text-slate-400 mt-2 max-w-sm">Select a chat to start messaging, or create a new one to invite your friends.</p>
+            </div>
+            <div id="chat-view" class="hidden flex-1 flex-col">
+                <div class="flex items-center justify-between p-4 bg-slate-800 border-b border-slate-700 shadow-sm">
+                    <p id="chat-title" class="font-bold text-lg">Chat Name</p>
+                    <button id="add-members-btn" class="p-2 rounded-full hover:bg-slate-700 transition">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div id="messages-container" class="flex-1 p-6 space-y-6 overflow-y-auto"></div>
+                <div class="p-4 bg-slate-800 border-t border-slate-700">
+                    <form id="message-form" class="flex items-center space-x-3">
+                        <label for="image-upload" class="cursor-pointer p-3 bg-slate-700 rounded-lg hover:bg-slate-600 transition">
+                            <i data-lucide="image" class="w-5 h-5"></i>
+                            <input type="file" id="image-upload" class="hidden" accept="image/*">
+                        </label>
+                        <input id="message-input" type="text" placeholder="Type a message..." class="flex-1 p-3 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" autocomplete="off">
+                        <button type="submit" class="p-3 font-semibold text-slate-900 bg-emerald-400 rounded-lg hover:bg-emerald-500 transition-colors">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="profile-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div class="bg-slate-800 rounded-2xl shadow-lg w-full max-w-lg fade-in">
+            <div class="flex items-center justify-between p-4 border-b border-slate-700">
+                <h3 class="text-lg font-bold">My Profile</h3>
+                <button id="close-profile-modal-btn" class="p-1 rounded-full hover:bg-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex border-b border-slate-700">
+                <button id="show-edit-profile-btn" class="flex-1 p-3 font-semibold text-emerald-400 border-b-2 border-emerald-400 transition">Edit Profile</button>
+                <button id="show-friends-btn" class="flex-1 p-3 font-semibold text-slate-400 transition">Friends</button>
+            </div>
+            <div id="edit-profile-content" class="p-6 space-y-4">
+                <div>
+                    <label for="edit-pfp" class="text-sm font-medium text-slate-300">Profile Picture URL</label>
+                    <input id="edit-pfp" type="text" class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg" placeholder="https://.../image.png">
+                </div>
+                <div>
+                    <label for="edit-username" class="text-sm font-medium text-slate-300">Username</label>
+                    <input id="edit-username" type="text" class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg">
+                </div>
+                <div>
+                    <label for="edit-bio" class="text-sm font-medium text-slate-300">Bio</label>
+                    <textarea id="edit-bio" rows="2" class="w-full mt-1 p-3 bg-slate-700 border border-slate-600 rounded-lg"></textarea>
+                </div>
+                <button id="save-profile-btn" class="w-full p-3 font-semibold text-slate-900 bg-emerald-400 rounded-lg hover:bg-emerald-500">Save Changes</button>
+            </div>
+            <div id="friends-content" class="p-6 hidden">
+                <form id="add-friend-form" class="flex items-center space-x-2 mb-4">
+                    <input id="add-friend-input" type="text" placeholder="Enter a username to add" class="flex-1 p-3 bg-slate-700 border rounded-lg">
+                    <button type="submit" class="p-3 text-slate-900 bg-emerald-400 rounded-lg hover:bg-emerald-500"><i data-lucide="user-plus" class="w-5 h-5"></i></button>
+                </form>
+                <h4 class="font-semibold mb-2">Friend List</h4>
+                <div id="friends-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+            <div class="p-4 border-t border-slate-700 text-right">
+                <button id="logout-btn" class="px-4 py-2 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700">Log Out</button>
+            </div>
+        </div>
+    </div>
+    <div id="add-members-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div class="bg-slate-800 rounded-2xl shadow-lg w-full max-w-md fade-in">
+            <div class="flex items-center justify-between p-4 border-b border-slate-700">
+                <h3 class="text-lg font-bold">Add Friends to Chat</h3>
+                <button id="close-add-members-modal-btn" class="p-1 rounded-full hover:bg-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-slate-400 mb-4">Select friends to add to this chat.</p>
+                <form id="add-members-form">
+                    <div id="add-members-friends-list" class="space-y-3 max-h-60 overflow-y-auto mb-4 p-1"></div>
+                    <button type="submit" class="w-full p-3 font-semibold text-slate-900 bg-emerald-400 rounded-lg hover:bg-emerald-500">Add to Chat</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            let state = {
+                db: null,
+                currentUser: null,
+                activeChatId: null,
+            };
+
+            const DB_KEY = 'ribbit-db';
+            const SESSION_KEY = 'ribbit-session';
+
+            function getDB() {
+                const dbString = localStorage.getItem(DB_KEY);
+                return dbString ? JSON.parse(dbString) : { users: {}, chats: {} };
+            }
+
+            function saveDB(db) {
+                localStorage.setItem(DB_KEY, JSON.stringify(db));
+            }
+
+            function getCurrentUser() {
+                return sessionStorage.getItem(SESSION_KEY);
+            }
+
+            function setCurrentUser(username) {
+                sessionStorage.setItem(SESSION_KEY, username);
+            }
+
+            function clearCurrentUser() {
+                sessionStorage.removeItem(SESSION_KEY);
+            }
+
+            // --- UI ELEMENTS ---
+            const allUI = {
+                authPage: document.getElementById('auth-page'),
+                mainApp: document.getElementById('main-app'),
+                globalLoader: document.getElementById('global-loader'),
+                signupForm: document.getElementById('signup-form'),
+                loginForm: document.getElementById('login-form'),
+                showSignupBtn: document.getElementById('show-signup-btn'),
+                showLoginBtn: document.getElementById('show-login-btn'),
+                welcomeScreen: document.getElementById('welcome-screen'),
+                chatView: document.getElementById('chat-view'),
+                chatList: document.getElementById('chat-list'),
+                messagesContainer: document.getElementById('messages-container'),
+                messageForm: document.getElementById('message-form'),
+                messageInput: document.getElementById('message-input'),
+                imageUpload: document.getElementById('image-upload'),
+                chatTitle: document.getElementById('chat-title'),
+                sidebarPfp: document.getElementById('sidebar-pfp'),
+                sidebarUsername: document.getElementById('sidebar-username'),
+                profileModal: document.getElementById('profile-modal'),
+                addMembersModal: document.getElementById('add-members-modal'),
+                profileButton: document.getElementById('profile-button'),
+                closeProfileModalBtn: document.getElementById('close-profile-modal-btn'),
+                showEditProfileBtn: document.getElementById('show-edit-profile-btn'),
+                showFriendsBtn: document.getElementById('show-friends-btn'),
+                editProfileContent: document.getElementById('edit-profile-content'),
+                friendsContent: document.getElementById('friends-content'),
+                editPfp: document.getElementById('edit-pfp'),
+                editUsername: document.getElementById('edit-username'),
+                editBio: document.getElementById('edit-bio'),
+                saveProfileBtn: document.getElementById('save-profile-btn'),
+                logoutBtn: document.getElementById('logout-btn'),
+                addFriendForm: document.getElementById('add-friend-form'),
+                addFriendInput: document.getElementById('add-friend-input'),
+                friendsList: document.getElementById('friends-list'),
+                newChatBtn: document.getElementById('new-chat-btn'),
+                addMembersBtn: document.getElementById('add-members-btn'),
+                closeAddMembersModalBtn: document.getElementById('close-add-members-modal-btn'),
+                addMembersForm: document.getElementById('add-members-form'),
+                addMembersFriendsList: document.getElementById('add-members-friends-list'),
+            };
+
+            // --- RENDER FUNCTIONS ---
+            const renderApp = () => {
+                state.db = getDB();
+                state.currentUser = getCurrentUser();
+
+                if (!state.currentUser) {
+                    allUI.authPage.style.display = 'flex';
+                    allUI.mainApp.style.display = 'none';
+                } else {
+                    allUI.authPage.style.display = 'none';
+                    allUI.mainApp.style.display = 'flex';
+                    const userProfile = state.db.users[state.currentUser];
+                    allUI.sidebarPfp.src = userProfile.pfp || 'https://placehold.co/40x40/1e293b/94a3b8?text=PFP';
+                    allUI.sidebarUsername.textContent = userProfile.username;
+                    renderChatList();
+                    renderChatView();
+                }
+                lucide.createIcons();
+            };
+
+            const renderChatList = () => {
+                allUI.chatList.innerHTML = '';
+                const userChats = Object.values(state.db.chats).filter(chat => chat.members.includes(state.currentUser));
+                if (userChats.length === 0) {
+                    allUI.chatList.innerHTML = `<p class="text-sm text-slate-400 p-2">No chats yet.</p>`;
+                    return;
+                }
+                userChats.sort((a,b) => (b.messages.at(-1)?.timestamp || 0) - (a.messages.at(-1)?.timestamp || 0));
+                
+                userChats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = `flex items-center p-3 rounded-lg cursor-pointer hover:bg-slate-700 transition ${state.activeChatId === chat.id ? 'bg-emerald-500/20' : ''}`;
+                    chatItem.dataset.chatId = chat.id;
+                    chatItem.innerHTML = `
+                        <div class="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center font-bold text-emerald-300 mr-3 text-lg">${chat.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <p class="font-semibold">${chat.name}</p>
+                            <p class="text-xs text-slate-400">${chat.members.length} member(s)</p>
+                        </div>
+                    `;
+                    chatItem.addEventListener('click', () => {
+                        state.activeChatId = chat.id;
+                        renderChatList();
+                        renderChatView();
+                    });
+                    allUI.chatList.appendChild(chatItem);
+                });
+            };
+
+            const renderChatView = () => {
+                if (!state.activeChatId || !state.db.chats[state.activeChatId]) {
+                    state.activeChatId = null;
+                    allUI.welcomeScreen.style.display = 'flex';
+                    allUI.chatView.style.display = 'none';
+                } else {
+                    allUI.welcomeScreen.style.display = 'none';
+                    allUI.chatView.style.display = 'flex';
+                    const chat = state.db.chats[state.activeChatId];
+                    allUI.chatTitle.textContent = chat.name;
+                    renderMessages();
+                }
+            };
+
+            const renderMessages = () => {
+                allUI.messagesContainer.innerHTML = '';
+                if (!state.activeChatId) return;
+                const chat = state.db.chats[state.activeChatId];
+                chat.messages.forEach(msg => {
+                    const author = state.db.users[msg.author];
+                    if (!author) return;
+                    const isCurrentUser = msg.author === state.currentUser;
+                    const msgWrapper = document.createElement('div');
+                    msgWrapper.className = `flex items-start gap-3 ${isCurrentUser ? 'flex-row-reverse' : ''}`;
+                    
+                    const reactionsHTML = Object.entries(msg.reactions || {})
+                        .map(([emoji, users]) => `<div class="px-2 py-0.5 bg-slate-700 rounded-full text-xs flex items-center" data-emoji="${emoji}" data-msg-id="${msg.id}">${emoji} <span class="ml-1 text-slate-300">${users.length}</span></div>`)
+                        .join('');
+
+                    msgWrapper.innerHTML = `
+                        <img src="${author.pfp || 'https://placehold.co/40x40/1e293b/94a3b8?text=PFP'}" alt="${author.username}" class="w-10 h-10 rounded-full object-cover">
+                        <div class="flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-semibold text-sm">${author.username}</span>
+                                <span class="text-xs text-slate-500">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div class="max-w-md p-3 rounded-xl ${isCurrentUser ? 'bg-emerald-600 rounded-br-none' : 'bg-slate-700 rounded-bl-none'}">
+                                ${msg.type === 'image' ? `<img src="${msg.content}" class="max-w-xs rounded-lg cursor-pointer" onclick="window.open('${msg.content}', '_blank')">` : `<p class="whitespace-pre-wrap">${msg.content}</p>`}
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <div class="flex gap-1">${reactionsHTML}</div>
+                                <div class="relative group">
+                                    <button class="p-1 rounded-full hover:bg-slate-600"><i data-lucide="smile-plus" class="w-4 h-4 text-slate-400"></i></button>
+                                    <div class="emoji-picker absolute bottom-full mb-2 hidden group-hover:flex gap-2 bg-slate-800 p-2 rounded-lg shadow-lg">
+                                        ${['👍', '❤️', '😂', '😯', '😢', '😠'].map(emoji => `<button class="emoji-option text-xl" data-emoji="${emoji}" data-msg-id="${msg.id}">${emoji}</button>`).join('')}
+                                    </div>
+                                </div>
+                                ${isCurrentUser ? `<button class="delete-btn p-1 rounded-full hover:bg-red-500/20" data-msg-id="${msg.id}"><i data-lucide="trash-2" class="w-4 h-4 text-slate-400 hover:text-red-400"></i></button>` : ''}
+                            </div>
+                        </div>`;
+                    allUI.messagesContainer.appendChild(msgWrapper);
+                });
+                allUI.messagesContainer.scrollTop = allUI.messagesContainer.scrollHeight;
+                lucide.createIcons();
+            };
+
+            const renderProfileModal = () => {
+                const user = state.db.users[state.currentUser];
+                allUI.editPfp.value = user.pfp || '';
+                allUI.editUsername.value = user.username;
+                allUI.editBio.value = user.bio || '';
+            };
+
+            const renderFriendsList = () => {
+                allUI.friendsList.innerHTML = '';
+                const user = state.db.users[state.currentUser];
+                if (!user.friends || user.friends.length === 0) {
+                    allUI.friendsList.innerHTML = `<p class="text-sm text-slate-400">No friends yet.</p>`;
+                    return;
+                }
+                user.friends.forEach(friendUsername => {
+                    const friend = state.db.users[friendUsername];
+                    if (!friend) return;
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'flex items-center justify-between p-2 bg-slate-700 rounded-lg';
+                    friendItem.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${friend.pfp || 'https://placehold.co/32x32/1e293b/94a3b8?text=PFP'}" class="w-8 h-8 rounded-full object-cover mr-3">
+                            <span class="font-semibold">${friend.username}</span>
+                        </div>
+                        <button class="remove-friend-btn p-1 text-slate-400 hover:text-red-400" data-friend-username="${friendUsername}"><i data-lucide="user-minus" class="w-4 h-4"></i></button>`;
+                    allUI.friendsList.appendChild(friendItem);
+                });
+                lucide.createIcons();
+            };
+
+            // --- EVENT HANDLERS ---
+            const handleSignup = (e) => {
+                e.preventDefault();
+                const username = allUI.signupForm.querySelector('#signup-username').value.trim();
+                const password = allUI.signupForm.querySelector('#signup-password').value;
+                const bio = allUI.signupForm.querySelector('#signup-bio').value;
+                
+                const db = getDB();
+                if (db.users[username]) {
+                    alert('Username already taken.');
+                    return;
+                }
+                
+                db.users[username] = { username, password, bio, pfp: '', friends: [] };
+                saveDB(db);
+                setCurrentUser(username);
+                renderApp();
+            };
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                const username = allUI.loginForm.querySelector('#login-username').value.trim();
+                const password = allUI.loginForm.querySelector('#login-password').value;
+                const db = getDB();
+                const user = db.users[username];
+                if (user && user.password === password) {
+                    setCurrentUser(username);
+                    renderApp();
+                } else {
+                    alert('Invalid username or password.');
+                }
+            };
+            
+            const handleLogout = () => {
+                clearCurrentUser();
+                state.activeChatId = null;
+                renderApp();
+            };
+            
+            const handleNewChat = () => {
+                const chatName = prompt('Enter a name for the new chat:');
+                if (chatName) {
+                    const db = getDB();
+                    const chatId = 'chat_' + Date.now();
+                    db.chats[chatId] = { id: chatId, name: chatName, members: [state.currentUser], messages: [] };
+                    saveDB(db);
+                    state.activeChatId = chatId;
+                    renderApp();
+                }
+            };
+            
+            const handleSendMessage = (e) => {
+                e.preventDefault();
+                const content = allUI.messageInput.value.trim();
+                if (!content || !state.activeChatId) return;
+
+                const message = {
+                    id: 'msg_' + Date.now(),
+                    author: state.currentUser,
+                    content,
+                    timestamp: Date.now(),
+                    type: 'text',
+                    reactions: {}
+                };
+                
+                const db = getDB();
+                db.chats[state.activeChatId].messages.push(message);
+                saveDB(db);
+                renderApp();
+                allUI.messageForm.reset();
+            };
+
+            const handleImageUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file || !state.activeChatId) return;
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const message = {
+                        id: 'msg_' + Date.now(),
+                        author: state.currentUser,
+                        content: reader.result,
+                        timestamp: Date.now(),
+                        type: 'image',
+                        reactions: {}
+                    };
+                    const db = getDB();
+                    db.chats[state.activeChatId].messages.push(message);
+                    saveDB(db);
+                    renderApp();
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const handleReaction = (e) => {
+                const target = e.target.closest('.emoji-option');
+                if(!target) return;
+
+                const msgId = target.dataset.msgId;
+                const emoji = target.dataset.emoji;
+                
+                const db = getDB();
+                const message = db.chats[state.activeChatId].messages.find(m => m.id === msgId);
+                
+                if (!message.reactions[emoji]) {
+                    message.reactions[emoji] = [];
+                }
+                
+                if (message.reactions[emoji].includes(state.currentUser)) {
+                    message.reactions[emoji] = message.reactions[emoji].filter(u => u !== state.currentUser);
+                    if (message.reactions[emoji].length === 0) {
+                        delete message.reactions[emoji];
+                    }
+                } else {
+                    message.reactions[emoji].push(state.currentUser);
+                }
+                
+                saveDB(db);
+                renderApp();
+            };
+
+            const handleDeleteMessage = (e) => {
+                const target = e.target.closest('.delete-btn');
+                if(!target) return;
+                const msgId = target.dataset.msgId;
+                
+                const db = getDB();
+                const chat = db.chats[state.activeChatId];
+                chat.messages = chat.messages.filter(m => m.id !== msgId);
+                saveDB(db);
+                renderApp();
+            };
+
+            const handleSaveProfile = () => {
+                const db = getDB();
+                const newUsername = allUI.editUsername.value.trim();
+                
+                if (newUsername !== state.currentUser && db.users[newUsername]) {
+                    alert('Username already taken.');
+                    return;
+                }
+                
+                const oldUserData = db.users[state.currentUser];
+                delete db.users[state.currentUser];
+                
+                oldUserData.username = newUsername;
+                oldUserData.pfp = allUI.editPfp.value.trim();
+                oldUserData.bio = allUI.editBio.value;
+                db.users[newUsername] = oldUserData;
+                
+                // Update username in chats and friends lists
+                Object.values(db.chats).forEach(chat => {
+                    chat.members = chat.members.map(m => m === state.currentUser ? newUsername : m);
+                    chat.messages.forEach(msg => {
+                        if (msg.author === state.currentUser) msg.author = newUsername;
+                    });
+                });
+                Object.values(db.users).forEach(user => {
+                    user.friends = user.friends.map(f => f === state.currentUser ? newUsername : f);
+                });
+                
+                setCurrentUser(newUsername);
+                saveDB(db);
+                renderApp();
+                allUI.profileModal.classList.add('hidden');
+            };
+
+            const handleAddFriend = (e) => {
+                e.preventDefault();
+                const friendUsername = allUI.addFriendInput.value.trim();
+                const db = getDB();
+                
+                if (!db.users[friendUsername]) {
+                    alert('User not found.');
+                    return;
+                }
+                
+                const currentUser = db.users[state.currentUser];
+                if (currentUser.friends.includes(friendUsername) || friendUsername === state.currentUser) {
+                    alert('Already friends or trying to add yourself.');
+                    return;
+                }
+
+                currentUser.friends.push(friendUsername);
+                saveDB(db);
+                renderFriendsList();
+                allUI.addFriendInput.value = '';
+            };
+
+            const handleRemoveFriend = (e) => {
+                const friendUsername = e.currentTarget.dataset.friendUsername;
+                const db = getDB();
+                const user = db.users[state.currentUser];
+                user.friends = user.friends.filter(f => f !== friendUsername);
+                saveDB(db);
+                renderFriendsList();
+            };
+
+            const openAddMembersModal = () => {
+                if (!state.activeChatId) return;
+                allUI.addMembersFriendsList.innerHTML = '';
+                const db = getDB();
+                const user = db.users[state.currentUser];
+                const chat = db.chats[state.activeChatId];
+                const friendsToAdd = user.friends.filter(f => !chat.members.includes(f));
+                
+                if (friendsToAdd.length === 0) {
+                    allUI.addMembersFriendsList.innerHTML = `<p class="text-sm text-slate-400">No friends to add.</p>`;
+                } else {
+                    friendsToAdd.forEach(friendUsername => {
+                        const friend = db.users[friendUsername];
+                        const friendItem = document.createElement('label');
+                        friendItem.className = 'flex items-center p-2 bg-slate-700 rounded-lg hover:bg-slate-600 cursor-pointer transition';
+                        friendItem.innerHTML = `
+                            <input type="checkbox" name="friend" value="${friend.username}" class="w-4 h-4 mr-4 bg-slate-600 border-slate-500 text-emerald-500 focus:ring-emerald-500 rounded">
+                            <img src="${friend.pfp || 'https://placehold.co/32x32/1e293b/94a3b8?text=PFP'}" class="w-8 h-8 rounded-full object-cover mr-3">
+                            <span class="font-semibold">${friend.username}</span>`;
+                        allUI.addMembersFriendsList.appendChild(friendItem);
+                    });
+                }
+                allUI.addMembersModal.classList.remove('hidden');
+            };
+
+            const handleAddMembers = (e) => {
+                e.preventDefault();
+                const selectedFriends = Array.from(allUI.addMembersForm.querySelectorAll('input[name="friend"]:checked')).map(input => input.value);
+                if (selectedFriends.length > 0 && state.activeChatId) {
+                    const db = getDB();
+                    const chat = db.chats[state.activeChatId];
+                    chat.members.push(...selectedFriends);
+                    
+                    selectedFriends.forEach(friend => {
+                        const systemMessage = {
+                            id: 'msg_' + Date.now() + Math.random(),
+                            author: state.currentUser,
+                            content: `${state.currentUser} added ${friend} to the chat.`,
+                            timestamp: Date.now(),
+                            type: 'system',
+                            reactions: {}
+                        };
+                         chat.messages.push(systemMessage);
+                    });
+                    
+                    saveDB(db);
+                    renderApp();
+                    allUI.addMembersModal.classList.add('hidden');
+                }
+            };
+            
+            // --- EVENT LISTENERS ---
+            window.addEventListener('storage', (event) => {
+                if (event.key === DB_KEY) {
+                    renderApp();
+                }
+            });
+
+            // Auth page tabs
+            allUI.showSignupBtn.addEventListener('click', () => {
+                allUI.signupForm.classList.remove('hidden');
+                allUI.loginForm.classList.add('hidden');
+                allUI.showSignupBtn.classList.add('text-emerald-400', 'border-emerald-400');
+                allUI.showLoginBtn.classList.remove('text-emerald-400', 'border-emerald-400');
+            });
+            allUI.showLoginBtn.addEventListener('click', () => {
+                allUI.loginForm.classList.remove('hidden');
+                allUI.signupForm.classList.add('hidden');
+                allUI.showLoginBtn.classList.add('text-emerald-400', 'border-emerald-400');
+                allUI.showSignupBtn.classList.remove('text-emerald-400', 'border-emerald-400');
+            });
+            // Profile modal tabs
+             allUI.showEditProfileBtn.addEventListener('click', () => {
+                allUI.editProfileContent.classList.remove('hidden');
+                allUI.friendsContent.classList.add('hidden');
+                allUI.showEditProfileBtn.classList.add('text-emerald-400', 'border-emerald-400');
+                allUI.showFriendsBtn.classList.remove('text-emerald-400', 'border-emerald-400');
+            });
+            allUI.showFriendsBtn.addEventListener('click', () => {
+                allUI.friendsContent.classList.remove('hidden');
+                allUI.editProfileContent.classList.add('hidden');
+                allUI.showFriendsBtn.classList.add('text-emerald-400', 'border-emerald-400');
+                allUI.showEditProfileBtn.classList.remove('text-emerald-400', 'border-emerald-400');
+                renderFriendsList();
+            });
+            
+            // Forms
+            allUI.signupForm.addEventListener('submit', handleSignup);
+            allUI.loginForm.addEventListener('submit', handleLogin);
+            allUI.messageForm.addEventListener('submit', handleSendMessage);
+            allUI.addFriendForm.addEventListener('submit', handleAddFriend);
+            allUI.addMembersForm.addEventListener('submit', handleAddMembers);
+
+            // Buttons & Inputs
+            allUI.imageUpload.addEventListener('change', handleImageUpload);
+            allUI.logoutBtn.addEventListener('click', handleLogout);
+            allUI.newChatBtn.addEventListener('click', handleNewChat);
+            allUI.saveProfileBtn.addEventListener('click', handleSaveProfile);
+            allUI.addMembersBtn.addEventListener('click', openAddMembersModal);
+            
+            // Message actions (delegated)
+            allUI.messagesContainer.addEventListener('click', (e) => {
+                handleReaction(e);
+                handleDeleteMessage(e);
+            });
+            allUI.friendsList.addEventListener('click', (e) => {
+                if(e.target.closest('.remove-friend-btn')) {
+                    handleRemoveFriend(e.target.closest('.remove-friend-btn'));
+                }
+            });
+            
+            // Modals
+            allUI.profileButton.addEventListener('click', () => {
+                renderProfileModal();
+                allUI.profileModal.classList.remove('hidden');
+            });
+            allUI.closeProfileModalBtn.addEventListener('click', () => allUI.profileModal.classList.add('hidden'));
+            allUI.closeAddMembersModalBtn.addEventListener('click', () => allUI.addMembersModal.classList.add('hidden'));
+
+            // Initial Load
+            renderApp();
+        });
+    </script>
+</body>
+</html>
+
